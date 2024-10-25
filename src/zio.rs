@@ -4,23 +4,31 @@ use std::mem;
 
 use crate::{Compress, Decompress, DecompressError, FlushCompress, FlushDecompress, Status};
 
+///
 #[derive(Debug)]
 pub struct Writer<W: Write, D: Ops> {
     obj: Option<W>,
+    ///
     pub data: D,
     buf: Vec<u8>,
 }
 
+///
 pub trait Ops {
+    ///
     type Flush: Flush;
+    ///
     fn total_in(&self) -> u64;
+    ///
     fn total_out(&self) -> u64;
+    ///
     fn run(
         &mut self,
         input: &[u8],
         output: &mut [u8],
         flush: Self::Flush,
     ) -> Result<Status, DecompressError>;
+    ///
     fn run_vec(
         &mut self,
         input: &[u8],
@@ -81,9 +89,13 @@ impl Ops for Decompress {
     }
 }
 
+///
 pub trait Flush {
+    ///
     fn none() -> Self;
+    ///
     fn sync() -> Self;
+    ///
     fn finish() -> Self;
 }
 
@@ -115,6 +127,7 @@ impl Flush for FlushDecompress {
     }
 }
 
+///
 pub fn read<R, D>(obj: &mut R, data: &mut D, dst: &mut [u8]) -> io::Result<usize>
 where
     R: BufRead,
@@ -157,6 +170,7 @@ where
 }
 
 impl<W: Write, D: Ops> Writer<W, D> {
+    ///
     pub fn new(w: W, d: D) -> Writer<W, D> {
         Writer {
             obj: Some(w),
@@ -165,6 +179,7 @@ impl<W: Write, D: Ops> Writer<W, D> {
         }
     }
 
+    ///
     pub fn finish(&mut self) -> io::Result<()> {
         loop {
             self.dump()?;
@@ -177,15 +192,18 @@ impl<W: Write, D: Ops> Writer<W, D> {
         }
     }
 
+    ///
     pub fn replace(&mut self, w: W) -> W {
         self.buf.truncate(0);
         mem::replace(self.get_mut(), w)
     }
 
+    ///
     pub fn get_ref(&self) -> &W {
         self.obj.as_ref().unwrap()
     }
 
+    ///
     pub fn get_mut(&mut self) -> &mut W {
         self.obj.as_mut().unwrap()
     }
@@ -194,10 +212,12 @@ impl<W: Write, D: Ops> Writer<W, D> {
     // to be consumed!
     //
     // (e.g. an implementation of `into_inner`)
+    ///
     pub fn take_inner(&mut self) -> W {
         self.obj.take().unwrap()
     }
 
+    ///
     pub fn is_present(&self) -> bool {
         self.obj.is_some()
     }

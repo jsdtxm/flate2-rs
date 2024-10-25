@@ -111,6 +111,7 @@ mod deflate;
 mod ffi;
 mod gz;
 mod mem;
+///
 pub mod zio;
 mod zlib;
 
