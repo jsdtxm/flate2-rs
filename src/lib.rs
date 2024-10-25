@@ -111,7 +111,7 @@ mod deflate;
 mod ffi;
 mod gz;
 mod mem;
-mod zio;
+pub mod zio;
 mod zlib;
 
 /// Types which operate over [`Read`] streams, both encoders and decoders for
